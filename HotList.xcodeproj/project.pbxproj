@@ -13,6 +13,8 @@
 		0392B63F241D4AC1005BD46F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0392B63D241D4AC1005BD46F /* Main.storyboard */; };
 		0392B641241D4AC2005BD46F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0392B640241D4AC2005BD46F /* Assets.xcassets */; };
 		0392B644241D4AC2005BD46F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0392B642241D4AC2005BD46F /* LaunchScreen.storyboard */; };
+		0392B650241D708F005BD46F /* HotDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0392B64F241D708F005BD46F /* HotDefinitions.swift */; };
+		0392B652241D70E7005BD46F /* HotTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0392B651241D70E7005BD46F /* HotTask.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		0392B640241D4AC2005BD46F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0392B643241D4AC2005BD46F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0392B645241D4AC2005BD46F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0392B64F241D708F005BD46F /* HotDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotDefinitions.swift; sourceTree = "<group>"; };
+		0392B651241D70E7005BD46F /* HotTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotTask.swift; path = HotList/HotTask.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +64,7 @@
 				0392B64C241D4B44005BD46F /* View */,
 				0392B64B241D4B3A005BD46F /* Controller */,
 				0392B64E241D4B68005BD46F /* Supporting files */,
+				0392B64F241D708F005BD46F /* HotDefinitions.swift */,
 			);
 			path = HotList;
 			sourceTree = "<group>";
@@ -83,6 +88,7 @@
 		0392B64D241D4B4E005BD46F /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0392B651241D70E7005BD46F /* HotTask.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -172,7 +178,9 @@
 			files = (
 				0392B63C241D4AC1005BD46F /* ViewController.swift in Sources */,
 				0392B638241D4AC1005BD46F /* AppDelegate.swift in Sources */,
+				0392B650241D708F005BD46F /* HotDefinitions.swift in Sources */,
 				0392B63A241D4AC1005BD46F /* SceneDelegate.swift in Sources */,
+				0392B652241D70E7005BD46F /* HotTask.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
