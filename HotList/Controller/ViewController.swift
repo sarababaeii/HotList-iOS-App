@@ -8,14 +8,24 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCellDelegate {
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var progressLabel: UILabel!
     
     var priorityTasks = [HotTask]()
     var bonusTasks = [HotTask]()
     var lastDeletedTask: HotTask?
     var lastDeletedIndexPath: IndexPath?
     
+    //MARK: Cells delegates
+    func taskCell(_ cell: TaskTableViewCell, completionChanged completion: Bool){
+        if let indexPath = tableView.indexPath(for: cell) {
+            if let task = hotTaskDataSource(indexPath: indexPath) {
+                task.completed = completion
+                updateProgress()
+            }
+        }
+    }
     
     //MARK: TableView delegates
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -41,10 +51,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let cell = tableView.dequeueReusableCell(withIdentifier: "NewTaskCellID", for: indexPath)
             return cell
         case 1, 2:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCellID", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCellID", for: indexPath) as! TaskTableViewCell
             let task = hotTaskDataSource(indexPath: indexPath)
-            cell.detailTextLabel?.text = task?.caption
-            cell.textLabel?.text = ("task \(indexPath.row + 1)")
+            cell.setCaption(task?.caption)
+            cell.delegate = self
             return cell
         default:
             return UITableViewCell.init()
@@ -64,14 +74,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         return nil
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-    }
-    
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .none
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -127,7 +129,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             }
             
             tableView.insertRows(at: [indexPath], with: .automatic)
+         
             deleteBackup()
+            updateProgress()
+            
             tableView.endUpdates()
         }
     }
@@ -148,6 +153,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             }
             
             tableView.deleteRows(at: [indexPath], with: .automatic)
+          
+            updateProgress()
+            
             tableView.endUpdates()
         }
     }
@@ -194,6 +202,31 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
     }
     
+    func updateProgress(){
+        let totalTasks = priorityTasks.count + bonusTasks.count
+        let completedTasks = priorityTasks.filter{ (task) -> Bool in
+            return task.completed == true
+        }.count + bonusTasks.filter{ (task) -> Bool in
+            return task.completed == true
+        }.count
+        var caption = "What's going on?"
+        
+        if totalTasks == 0 {
+            caption = "It's lonely here - add some tasks!"
+        }
+        else if completedTasks == 0{
+            caption = "Get started - \(totalTasks) to go!"
+        }
+        else if completedTasks == totalTasks{
+            caption = "Well done - \(totalTasks) completed!"
+        }
+        else{
+            caption = "\(completedTasks) down - \(totalTasks - completedTasks) to go!"
+        }
+        
+        progressLabel.text = caption
+    }
+    
     func populateInitialTasks(){
         priorityTasks.removeAll()
         
@@ -213,6 +246,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         tableView.dataSource = self
         
         populateInitialTasks()
+        
+        updateProgress()
     }
     
     override func viewDidLoad() {
@@ -222,4 +257,3 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         configure()
     }
 }
-
