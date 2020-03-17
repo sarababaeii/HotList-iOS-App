@@ -19,8 +19,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     //MARK: Cells delegates
     func newTaskCell(_ cell: NewTaskTableViewCell, newTaskCreated caption: String) {
-        let task = HotTask.init(caption: caption)
-        insertTask(task, at: tableView.indexPath(for: cell))
+        let newTask = HotTask.init(caption: caption)
+        insertTask(newTask, at: IndexPath(row: 0, section: 1))
     }
     
     func taskCell(_ cell: TaskTableViewCell, completionChanged completion: Bool){
@@ -145,19 +145,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func insertTask(_ task: HotTask?, at indexPath: IndexPath?){
         if let task = task, let indexPath = indexPath{
             tableView.beginUpdates()
-            
             if indexPath.section == 1 {
                 priorityTasks.insert(task, at: indexPath.row)
             }
             else{
                 bonusTasks.insert(task, at: indexPath.row)
             }
-            
+        
             tableView.insertRows(at: [indexPath], with: .automatic)
-         
+            
             deleteBackup()
             updateProgress()
-            
             tableView.endUpdates()
         }
     }

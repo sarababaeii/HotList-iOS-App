@@ -47,13 +47,13 @@ class NewTaskTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     func manageAddButton(){
-        var enable = false
+        var enabled = false
         if let caption = fetchInput() {
             if caption.count > 0 {  //useless?!
-                enable = true
+                enabled = true
             }
         }
-        addButton.isEnabled = enable
+        addButton.isEnabled = enabled
     }
     
     func fetchInput() -> String? {
@@ -69,6 +69,3 @@ class NewTaskTableViewCell: UITableViewCell, UITextFieldDelegate {
         return true
     }
 }
-
-
-//TODO: doesn't handle input
