@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCellDelegate, NewTaskCellDelegate {
     @IBOutlet weak var tableView: UITableView!
@@ -28,6 +29,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             if let task = hotTaskDataSource(indexPath: indexPath) {
                 task.completed = completion
                 updateProgress()
+                manageLocalNotifications()
             }
         }
     }
@@ -49,6 +51,49 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func adjustLayoutForKeyboard(targetHight: CGFloat){
         tableView.contentInset.bottom = targetHight
+    }
+    
+    //MARK: Notifications
+    func manageLocalNotifications(){
+        let totalTasks = calculateTotalTasks()
+        let completedTasks = calculateCompletedTasks()
+        
+        var title: String?
+        var body: String?
+        
+        if totalTasks == 0 {
+            title = "It's lonely here"
+            body = "Add some tasks!"
+        }
+        else if completedTasks == 0 {
+            title = "Get started!"
+            body = "You've got \(totalTasks) hot tasks to go!"
+        }
+        else if completedTasks < totalTasks {
+            title = "Progress in action!"
+            body = "\(completedTasks) down \(totalTasks - completedTasks) to go!"
+        }
+        
+        scheduleLocalNotification(title: title, body: body)
+    }
+    
+    func scheduleLocalNotification(title: String?, body: String?){
+        let identifier = "HostListSummary"
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        notificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier])
+        
+        if let newTitle = title, let newBody = body {
+            let content = UNMutableNotificationContent()
+            content.title = newTitle
+            content.body = newBody
+            content.sound = UNNotificationSound.default
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 7200, repeats: false)
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+            
+            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+        }
     }
     
     //MARK: TableView delegates
@@ -156,6 +201,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             
             deleteBackup()
             updateProgress()
+            manageLocalNotifications()
             tableView.endUpdates()
         }
     }
@@ -178,7 +224,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             tableView.deleteRows(at: [indexPath], with: .automatic)
           
             updateProgress()
-            
+            manageLocalNotifications()
             tableView.endUpdates()
         }
     }
@@ -226,12 +272,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func updateProgress(){
-        let totalTasks = priorityTasks.count + bonusTasks.count
-        let completedTasks = priorityTasks.filter{ (task) -> Bool in
-            return task.completed == true
-        }.count + bonusTasks.filter{ (task) -> Bool in
-            return task.completed == true
-        }.count
+        let totalTasks = calculateTotalTasks()
+        let completedTasks = calculateCompletedTasks()
+        
         var caption = "What's going on?"
         
         if totalTasks == 0 {
@@ -264,6 +307,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         bonusTasks.append(hotTask)
     }
     
+    func calculateTotalTasks() -> Int {
+        return priorityTasks.count + bonusTasks.count
+    }
+    
+    func calculateCompletedTasks() -> Int {
+        return priorityTasks.filter{ (task) -> Bool in
+            return task.completed == true
+        }.count + bonusTasks.filter{ (task) -> Bool in
+            return task.completed == true
+        }.count
+    }
+    
     func configure() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -273,6 +328,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         updateProgress()
         
         registerForKeyboardNotifications()
+        
+        manageLocalNotifications()
     }
     
     override func viewDidLoad() {
