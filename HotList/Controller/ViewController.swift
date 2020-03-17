@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCellDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TaskCellDelegate, NewTaskCellDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progressLabel: UILabel!
     
@@ -18,6 +18,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var lastDeletedIndexPath: IndexPath?
     
     //MARK: Cells delegates
+    func newTaskCell(_ cell: NewTaskTableViewCell, newTaskCreated caption: String) {
+        let task = HotTask.init(caption: caption)
+        insertTask(task, at: tableView.indexPath(for: cell))
+    }
+    
     func taskCell(_ cell: TaskTableViewCell, completionChanged completion: Bool){
         if let indexPath = tableView.indexPath(for: cell) {
             if let task = hotTaskDataSource(indexPath: indexPath) {
@@ -25,6 +30,25 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 updateProgress()
             }
         }
+    }
+    
+    //MARK: Keyboard management
+    func registerForKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification){
+        let keyboardFrame = notification.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! CGRect
+        adjustLayoutForKeyboard(targetHight: keyboardFrame.size.height)
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        adjustLayoutForKeyboard(targetHight: 0)
+    }
+    
+    func adjustLayoutForKeyboard(targetHight: CGFloat){
+        tableView.contentInset.bottom = targetHight
     }
     
     //MARK: TableView delegates
@@ -48,7 +72,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "NewTaskCellID", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "NewTaskCellID", for: indexPath) as! NewTaskTableViewCell
+            cell.delegate = self
             return cell
         case 1, 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCellID", for: indexPath) as! TaskTableViewCell
@@ -248,6 +273,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         populateInitialTasks()
         
         updateProgress()
+        
+        registerForKeyboardNotifications()
     }
     
     override func viewDidLoad() {
